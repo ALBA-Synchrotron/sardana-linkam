@@ -82,22 +82,26 @@ class LinkamTST350MotorCtrl(MotorController):
         """
         Get State of all axes
         """
+        self.idle = None
         try:
-            idle = self.device.read_attibute('IDLE').value
+            self.idle = self.device.read_attibute('IDLE').value
         except Exception as e:
             self.__log.error('StateAll error: %s' % e)
             self.state = State.Fault
             self.status = 'DS communication problem'
             return
 
-        if idle:
-            self.state = State.On
-            self.status = 'ON'
-        else:
-            self.state = State.Moving
-            self.status = 'Moving'
 
     def StateOne(self, axis):
+        if self.idle != None:
+            axis_idle = self.idle[axis-1]
+            if axis_idle:
+                self.state = State.On
+                self.status = 'ON'
+            else:
+                self.state = State.Moving
+                self.status = 'Moving'
+
         return self.state, self.status
 
     def ReadAll(self):
