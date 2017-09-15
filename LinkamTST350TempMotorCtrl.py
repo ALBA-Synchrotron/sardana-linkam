@@ -78,7 +78,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
     def StateOne(self, axis):
         try:
-            state = self.device.read_attibute('Program').value
+            state = self.device.read_attribute('Program').value
         except Exception as e:
             self._log.error('StateOne error: %s' % e)
             self.state = State.Fault
@@ -96,7 +96,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
     def ReadOne(self, axis):
         attr = self.AXIS_ATTR
-        value = self.device.read_attibute(attr).value
+        value = self.device.read_attribute(attr).value
         temp = value / self.attributes[axis]['step_per_unit']
         return temp
 
