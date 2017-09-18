@@ -103,7 +103,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
     def StartOne(self, axis, temperature):
         temperature = temperature * self.attributes[axis]['step_per_unit']
         velocity = self.attributes[axis]['velocity']
-        self.device.command_inout('StartRamp', velocity, temperature)
+        self.device.command_inout('StartRamp', [velocity, temperature])
 
     def AbortOne(self, axis):
         self.device.command_inout('HoldTemp')
