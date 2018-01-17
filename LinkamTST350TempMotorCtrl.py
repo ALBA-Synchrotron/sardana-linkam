@@ -78,20 +78,23 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
     def StateOne(self, axis):
         try:
-            state = self.device.read_attribute('Program').value
+            idle = self.device.read_attribute('IdleT').value
+            error = self.device.read_attribute('ErrorMsg').value
+            program = self.device.read_attribute('Program').value
         except Exception as e:
             self._log.error('StateOne error: %s' % e)
             self.state = State.Fault
             self.status = 'DS communication problem'
             return
 
-        if state.lower() == 'cooling' or state.lower() == 'heating':
-            self.state = State.Moving
-        elif state.lower() == 'Stopped':
-            self.state = State.Alarm
+        if error == "No_error":
+            if idle:
+                self.state = State.On
+            else:
+                self.state = State.Moving
         else:
-            self.state = State.On
-        self.status = state
+            self.state = State.Fault
+        self.status = program
         return self.state, self.status
 
     def ReadOne(self, axis):
