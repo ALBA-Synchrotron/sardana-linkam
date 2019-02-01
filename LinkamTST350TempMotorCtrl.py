@@ -57,6 +57,8 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
     def __init__(self, inst, props, *args, **kwargs):
 
+        self._target_temp = None
+        self._current_temp = None
         try:
             MotorController.__init__(self, inst, props, *args, **kwargs)
             self.device = PyTango.DeviceProxy(self.DeviceName)
@@ -71,7 +73,8 @@ class LinkamTST350TempMotorCtrl(MotorController):
         self.attributes[axis] = {'step_per_unit': 1.0,
                                  'base_rate': 0,
                                  'acceleration': 0,
-                                 'velocity': 1}
+                                 'velocity': 1.
+                                 'tolerance': 0}
 
     def DeleteDevice(self, axis):
         self.attributes[axis] = None
@@ -89,7 +92,17 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
         if error == "No_error":
             if idle:
-                self.state = State.On
+                self.state = State.Moving
+                if (self._target_temp is not None
+                    and self._current_temp is not None
+                    and self.attributes[axis]["tolerance"] > 0):
+                    
+                    diff_temp = abs(self._target_temp - self._current_temp)
+                    if self.attributes[axis]["tolerance"] >= diff_temp:
+                        self._target_temp = None
+                        self.state = State.On
+                else:
+                    self.state = State.On
             else:
                 self.state = State.Moving
         else:
@@ -101,15 +114,18 @@ class LinkamTST350TempMotorCtrl(MotorController):
         attr = self.AXIS_ATTR
         value = self.device.read_attribute(attr).value
         temp = value / self.attributes[axis]['step_per_unit']
+        self._current_temp = temp
         return temp
 
     def StartOne(self, axis, temperature):
+        self._target_temp = temperature
         temperature = temperature * self.attributes[axis]['step_per_unit']
         velocity = self.attributes[axis]['velocity']
         self.device.command_inout('StartRamp', [velocity, temperature])
 
     def AbortOne(self, axis):
         self.device.command_inout('HoldTemp')
+        self._target_temp = None
 
     def SetAxisPar(self, axis, name, value):
         """ Set the standard pool motor parameters.
@@ -129,6 +145,9 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
         elif name == "base_rate":
             self.attributes[axis]["base_rate"] = float(value)
+            
+        elif name == "tolerance":
+            self.attributes[axis]["tolerance"]  = float(value)
 
     def GetAxisPar(self, axis, name):
         """ Get the standard pool motor parameters.
@@ -148,6 +167,9 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
         elif name == "base_rate":
             value = self.attributes[axis]["base_rate"]
+        
+        elif name == "tolerance":
+            value = self.attributes[axis]["tolerance"]
 
         return value
 
