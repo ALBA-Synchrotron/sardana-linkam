@@ -73,7 +73,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
         self.attributes[axis] = {'step_per_unit': 1.0,
                                  'base_rate': 0,
                                  'acceleration': 0,
-                                 'velocity': 1.
+                                 'velocity': 1.,
                                  'tolerance': 0}
 
     def DeleteDevice(self, axis):
