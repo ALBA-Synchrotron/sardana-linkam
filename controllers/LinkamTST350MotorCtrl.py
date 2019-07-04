@@ -105,7 +105,7 @@ class LinkamTST350MotorCtrl(MotorController):
 
     def ReadAll(self):
         self.positionMultiple = {}
-        for axis in self.attributes.keys():
+        for axis in list(self.attributes.keys()):
             attr = self.AXIS_ATTR[axis-1]
             value = self.device.read_attribute(attr).value
             pos = value / self.attributes[axis]['step_per_unit']
@@ -126,13 +126,13 @@ class LinkamTST350MotorCtrl(MotorController):
         positions_list = []
 
         for i in range(3):
-            if self.startMultiple.has_key(i+1):
+            if i+1 in self.startMultiple:
                 pos = self.startMultiple[i+1]
             else:
                 attr = self.AXIS_ATTR[i]
                 pos = self.device.read_attribute(attr).value
             positions_list.append(int(pos))
-        print 'RH###: ', positions_list
+        print('RH###: ', positions_list)
         self.device.command_inout('MoveAbsolute', positions_list)
 
     def SetAxisPar(self, axis, name, value):
