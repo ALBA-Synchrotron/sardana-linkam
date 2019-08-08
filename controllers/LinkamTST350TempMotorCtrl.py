@@ -28,7 +28,8 @@
 ## along with this program; if not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import PyTango
-from sardana.pool.controller import MotorController
+from sardana.pool.controller import (MotorController, Type, Description,
+                                     DefaultValue)
 from sardana import State
 
 
@@ -54,6 +55,14 @@ class LinkamTST350TempMotorCtrl(MotorController):
                        'Description': 'Device name of the Linkam TST350'}}
 
     ctrl_extra_attributes = {}
+    
+    axis_attributes = {
+        "tolerance" : {
+            Type: float,
+            Description: "Tolerance for achieve the position",
+            DefaultValue: 0,
+            },
+    }
 
     def __init__(self, inst, props, *args, **kwargs):
 
@@ -145,9 +154,6 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
         elif name == "base_rate":
             self.attributes[axis]["base_rate"] = float(value)
-            
-        elif name == "tolerance":
-            self.attributes[axis]["tolerance"]  = float(value)
 
     def GetAxisPar(self, axis, name):
         """ Get the standard pool motor parameters.
@@ -168,9 +174,12 @@ class LinkamTST350TempMotorCtrl(MotorController):
         elif name == "base_rate":
             value = self.attributes[axis]["base_rate"]
         
-        elif name == "tolerance":
-            value = self.attributes[axis]["tolerance"]
-
         return value
 
-
+    def SetAxisExtraPar(self, axis, parameter, value):
+        if parameter == 'tolerance':
+            self.attributes[axis]["tolerance"]  = float(value)
+  
+    def GetAxisExtraPar(self, axis, parameter):
+        if parameter == 'tolerance':
+            return self.attributes[axis]["tolerance"]
