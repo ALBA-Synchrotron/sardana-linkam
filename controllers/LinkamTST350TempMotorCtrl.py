@@ -129,7 +129,8 @@ class LinkamTST350TempMotorCtrl(MotorController):
     def StartOne(self, axis, temperature):
         self._target_temp = temperature
         temperature = temperature * self.attributes[axis]['step_per_unit']
-        velocity = self.attributes[axis]['velocity']
+        # Sardana defines the velocity grads / seconds. Hw needs it in grads / minutes
+        velocity = self.attributes[axis]['velocity'] * 60
         self.device.command_inout('StartRamp', [velocity, temperature])
 
     def AbortOne(self, axis):
