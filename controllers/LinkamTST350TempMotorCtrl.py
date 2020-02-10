@@ -151,8 +151,9 @@ class LinkamTST350TempMotorCtrl(MotorController):
         _time = abs(self.ReadOne(axis) - temperature) / self.attributes[axis]['velocity']
         
         self.device.command_inout('StartRamp', [velocity, temperature])
-        # Calculate theoretical movement time  + tolerance
-        self._move_timeout = time.time() + _time * 2
+        # Calculate theoretical movement time + startup + tolerance
+        startup = 30
+        self._move_timeout = time.time() + _time * 2 + startup
 
     def AbortOne(self, axis):
         self.device.command_inout('HoldTemp')
