@@ -50,11 +50,9 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
     MaxDevice = 1
     AXIS_ATTR = 'Temperature'
-    class_prop = {'DeviceName':
-                      {'Type': 'PyTango.DevString',
-                       'Description': 'Device name of the Linkam TST350'}}
-
-    ctrl_extra_attributes = {}
+    ctrl_properties = {'DeviceName':
+                       {Type: 'PyTango.DevString',
+                        Description: 'Device name of the Linkam TST350'}}
     
     axis_attributes = {
         "tolerance" : {
