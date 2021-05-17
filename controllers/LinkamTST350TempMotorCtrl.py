@@ -46,7 +46,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
     sense.
 
     Position units: degrees.
-    Velocity units: degrees/second
+    Velocity units: degrees/minute
     """
 
     MaxDevice = 1
@@ -145,10 +145,11 @@ class LinkamTST350TempMotorCtrl(MotorController):
     def StartOne(self, axis, temperature):
         self._target_temp = temperature
         temperature = temperature * self.attributes[axis]['step_per_unit']
-        # Sardana defines the velocity grads / seconds. Hw needs it in grads / minutes
-        velocity = self.attributes[axis]['velocity'] * 60
+        velocity = self.attributes[axis]['velocity']
         
-        _time = abs(self.ReadOne(axis) - temperature) / self.attributes[axis]['velocity']
+        _delta_t = abs(self.ReadOne(axis) - temperature)
+        # _time is the ramp time in seconds. Velocity is in deg/min
+        _time = _delta_t / self.attributes[axis]['velocity'] * 60.0
         
         self.device.command_inout('StartRamp', [velocity, temperature])
         # Calculate theoretical movement time + startup + tolerance
