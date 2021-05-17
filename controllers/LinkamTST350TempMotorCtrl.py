@@ -27,6 +27,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import time
 import PyTango
 from sardana.pool.controller import (MotorController, Type, Description,
                                      DefaultValue)
@@ -45,7 +46,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
     sense.
 
     Position units: degrees.
-    Velocity units: degrees/second
+    Velocity units: degrees/minute
     """
 
     MaxDevice = 1
@@ -66,6 +67,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
         self._target_temp = None
         self._current_temp = None
+        self._move_timeout = float('inf')
         try:
             MotorController.__init__(self, inst, props, *args, **kwargs)
             self.device = PyTango.DeviceProxy(self.DeviceName)
@@ -99,7 +101,13 @@ class LinkamTST350TempMotorCtrl(MotorController):
 
         if error == "No_error":
             if idle:
-                self.state = State.Moving
+                if time.time() < self._move_timeout:
+                    self.state = State.Moving
+                else:
+                    self.state = State.Alarm
+                    self.status = 'Motor did not reach the desired position.'
+                    return self.state, self.status
+                    
                 if (self._target_temp is not None
                     and self._current_temp is not None
                     and self.attributes[axis]["tolerance"] > 0):
@@ -107,14 +115,22 @@ class LinkamTST350TempMotorCtrl(MotorController):
                     diff_temp = abs(self._target_temp - self._current_temp)
                     if self.attributes[axis]["tolerance"] >= diff_temp:
                         self._target_temp = None
+                        self._move_timeout = float('inf')
+                        #self.device.command_inout('HoldTemp')
                         self.state = State.On
                 else:
                     self.state = State.On
             else:
-                self.state = State.Moving
+                if time.time() < self._move_timeout:
+                    self.state = State.Moving
+                else:
+                    self.state = State.Alarm
+                    self.status = 'Motor did not reach the desired position.'
+                    return self.state, self.status
         else:
             self.state = State.Fault
         self.status = program
+        
         return self.state, self.status
 
     def ReadOne(self, axis):
@@ -128,7 +144,15 @@ class LinkamTST350TempMotorCtrl(MotorController):
         self._target_temp = temperature
         temperature = temperature * self.attributes[axis]['step_per_unit']
         velocity = self.attributes[axis]['velocity']
+        
+        _delta_t = abs(self.ReadOne(axis) - temperature)
+        # _time is the ramp time in seconds. Velocity is in deg/min
+        _time = _delta_t / self.attributes[axis]['velocity'] * 60.0
+        
         self.device.command_inout('StartRamp', [velocity, temperature])
+        # Calculate theoretical movement time + startup + tolerance
+        startup = 30
+        self._move_timeout = time.time() + _time * 2 + startup
 
     def AbortOne(self, axis):
         self.device.command_inout('HoldTemp')
