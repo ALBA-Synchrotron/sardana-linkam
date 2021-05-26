@@ -134,6 +134,10 @@ class LinkamTST350MotorCtrl(MotorController):
             positions_list.append(int(pos))
         print('RH###: ', positions_list)
         self.device.command_inout('MoveAbsolute', positions_list)
+        idle = [True, True, True]
+        while all(idle):
+            idle = self.device.read_attribute('Idle').value
+        self._log.debug("Idle state is %s" % str(idle))
 
     def SetAxisPar(self, axis, name, value):
         """ Set the standard pool motor parameters.
