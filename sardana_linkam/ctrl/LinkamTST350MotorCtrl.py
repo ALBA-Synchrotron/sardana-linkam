@@ -30,7 +30,8 @@
 
 import PyTango
 import time
-from sardana.pool.controller import MotorController
+from sardana.pool.controller import (MotorController, Type, Description,
+                                     DefaultValue)
 
 from sardana import State
 
@@ -49,11 +50,11 @@ class LinkamTST350MotorCtrl(MotorController):
     MaxDevice = 3
 
     AXIS_ATTR = ['PositionX', 'PositionY', 'PositionZ']
-    class_prop = {'DeviceName':
-                      {'Type': 'PyTango.DevString',
-                       'Description': 'Device name of the Smaract MCS DS'}}
+    ctrl_properties = {'DeviceName':
+                      {Type: 'str',
+                       Description: 'Device name of the Smaract MCS DS'}}
 
-    ctrl_extra_attributes = {}
+    axis_attributes = {}
 
     def __init__(self, inst, props, *args, **kwargs):
 
