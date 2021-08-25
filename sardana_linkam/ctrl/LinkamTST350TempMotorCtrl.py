@@ -97,7 +97,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
             self._log.error('StateOne error: %s' % e)
             self.state = State.Fault
             self.status = 'DS communication problem'
-            return
+            return self.state, self.status
 
         if error == "No_error":
             if idle:
