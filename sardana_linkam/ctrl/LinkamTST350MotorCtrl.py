@@ -133,7 +133,6 @@ class LinkamTST350MotorCtrl(MotorController):
                 attr = self.AXIS_ATTR[i]
                 pos = self.device.read_attribute(attr).value
             positions_list.append(int(pos))
-        print('RH###: ', positions_list)
         self.device.command_inout('MoveAbsolute', positions_list)
         idle = [True, True, True]
         count = 0
