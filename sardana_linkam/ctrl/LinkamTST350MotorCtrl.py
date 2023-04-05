@@ -136,8 +136,10 @@ class LinkamTST350MotorCtrl(MotorController):
         print('RH###: ', positions_list)
         self.device.command_inout('MoveAbsolute', positions_list)
         idle = [True, True, True]
-        while all(idle):
+        count = 0
+        while all(idle) and count < 20:
             idle = self.device.read_attribute('Idle').value
+            count += 1
         self._log.debug("Idle state is %s" % str(idle))
 
     def SetAxisPar(self, axis, name, value):
