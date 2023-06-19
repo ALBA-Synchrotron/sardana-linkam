@@ -152,10 +152,11 @@ class LinkamTST350MotorCtrl(MotorController):
             velocity = int(value * self.attributes[axis]['step_per_unit'])
             if axis in [0, 1]:
                 cmd = 'SetSpeedXY'
+                self.device.command_inout(cmd, velocity)
             else:
-                cmd = 'SetSpeedZ'
+                attr = 'SpeedZ'
+                self.device.write_attribute(attr, velocity)
             self.attributes[axis]['velocity'] = velocity
-            self.device.command_inout(cmd, velocity)
 
         elif name in ['acceleration', 'deceleration']:
             self.attributes[axis]['acceleration'] = value
