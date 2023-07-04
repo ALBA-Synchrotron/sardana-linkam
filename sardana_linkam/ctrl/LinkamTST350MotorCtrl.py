@@ -133,11 +133,12 @@ class LinkamTST350MotorCtrl(MotorController):
                 attr = self.AXIS_ATTR[i]
                 pos = self.device.read_attribute(attr).value
             positions_list.append(int(pos))
-        print('RH###: ', positions_list)
         self.device.command_inout('MoveAbsolute', positions_list)
         idle = [True, True, True]
-        while all(idle):
+        count = 0
+        while all(idle) and count < 20:
             idle = self.device.read_attribute('Idle').value
+            count += 1
         self._log.debug("Idle state is %s" % str(idle))
 
     def SetAxisPar(self, axis, name, value):
@@ -151,10 +152,11 @@ class LinkamTST350MotorCtrl(MotorController):
             velocity = int(value * self.attributes[axis]['step_per_unit'])
             if axis in [0, 1]:
                 cmd = 'SetSpeedXY'
+                self.device.command_inout(cmd, velocity)
             else:
-                cmd = 'SetSpeedZ'
+                attr = 'SpeedZ'
+                self.device.write_attribute(attr, velocity)
             self.attributes[axis]['velocity'] = velocity
-            self.device.command_inout(cmd, velocity)
 
         elif name in ['acceleration', 'deceleration']:
             self.attributes[axis]['acceleration'] = value
