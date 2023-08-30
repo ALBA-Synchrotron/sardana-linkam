@@ -149,7 +149,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
         # _time is the ramp time in seconds. Velocity is in deg/min
         _time = _delta_t / self.attributes[axis]['velocity'] * 60.0
         
-        self.device.command_inout('StartRamp', [velocity, temperature])
+        self.device.command_inout('StartRamp', [velocity * 60, temperature])
         # Calculate theoretical movement time + startup + tolerance
         startup = 30
         self._move_timeout = time.time() + _time * 2 + startup
