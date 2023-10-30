@@ -96,10 +96,11 @@ class LinkamT96MotorCtrl(MotorController):
         self._log.debug('DeleteDevice entering...')
         axis_name = self.axis2motor[axis]
         if axis_name == "axis_tst_stretcher":
-            self.attributes[axis] = None
+            self.attributes[axis_name] = None
 
     def StateAll(self):
-        pass
+        self._log.debug('Entering StateAll...')
+        self.device.UpdateStateFlags()
 
     def StateOne(self, axis):
         axis_name = self.axis2motor[axis]
@@ -140,7 +141,7 @@ class LinkamT96MotorCtrl(MotorController):
         self._log.debug('Entering StartOne for axis {} ({})'.format(axis, axis_name))
 
         if axis_name == 'axis_tst_stretcher':
-            position = position * self.attributes[axis]['step_per_unit']
+            position = position * self.attributes[axis_name]['step_per_unit']
             cmd = 'MoveGapAbsolute'
 
         elif axis_name == 'axis_tst_temperature':
@@ -217,9 +218,10 @@ class LinkamT96MotorCtrl(MotorController):
 
     def AbortOne(self, axis):
         axis_name = self.axis2motor[axis]
+        self._log.debug('In method AbortOne of axis {} ({})'.format(axis, axis_name))
         if axis_name == 'axis_tst_stretcher':
             cmd = 'StopTSTMotor'
-        if axis_name == 'axis_tst_stretcher':
+        elif axis_name == 'axis_tst_temperature':
             cmd = 'StopTemperature'
 
         self.device.command_inout(cmd)
