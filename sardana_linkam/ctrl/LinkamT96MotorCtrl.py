@@ -109,7 +109,7 @@ class LinkamT96MotorCtrl(MotorController):
         if axis_name == 'axis_tst_stretcher':
             attribute = 'tst_stretching'
         elif axis_name == 'axis_tst_temperature':
-            attribute = 'tst_ramping'
+            attribute = 'heater_ramping'
         
         if self.device.read_attribute(attribute).value:
             self.state = State.Moving
@@ -170,7 +170,7 @@ class LinkamT96MotorCtrl(MotorController):
 
             elif axis_name == 'axis_tst_temperature':
                 attr = 'ramp_rate'
-                self.device.write_attribute(attr, velocity)
+                self.device.write_attribute(attr, value)
 
         elif name == "step_per_unit":
             if axis_name == 'axis_tst_stretcher':
