@@ -222,7 +222,7 @@ class LinkamT96MotorCtrl(MotorController):
         if axis_name == 'axis_tst_stretcher':
             cmd = 'StopTSTMotor'
         elif axis_name == 'axis_tst_temperature':
-            cmd = 'StopTemperature'
+            cmd = 'HoldTemperature'
 
         self.device.command_inout(cmd)
 
