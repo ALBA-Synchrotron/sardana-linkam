@@ -51,10 +51,6 @@ class LinkamT96MotorCtrl(MotorController):
 
     MaxDevice = 3
 
-    # tst_stretcher = "tst_stretcher"
-    # tst_temperature = "tst_temperature"
-    # css_shearing = "css_shearing"
-
     axis2motor = {
         1: 'axis_tst_stretcher',
         2: 'axis_tst_temperature',
@@ -180,7 +176,7 @@ class LinkamT96MotorCtrl(MotorController):
                 raise Exception("{} is not supported for axis {} ({})".format(name, axis, axis_name))
 
         elif name in ['acceleration', 'deceleration', 'base_rate']:
-            if axis in ['tst_stretcher', 'tst_temperature']:
+            if axis in ['axis_tst_stretcher', 'axis_tst_temperature']:
                 raise Exception("{} does not support {}".format(self.__class__.__name__, name))
 
     def GetAxisPar(self, axis, name):
@@ -211,7 +207,7 @@ class LinkamT96MotorCtrl(MotorController):
                 raise Exception("{} is not supported for axis {} ({})".format(name, axis, axis_name))
 
         elif name in ['acceleration', 'deceleration', 'base_rate']:
-            if axis in ['tst_stretcher', 'tst_temperature']:
+            if axis in ['axis_tst_stretcher', 'axis_tst_temperature']:
                 raise Exception("{} does not support {}".format(self.__class__.__name__, name))
 
         return value
