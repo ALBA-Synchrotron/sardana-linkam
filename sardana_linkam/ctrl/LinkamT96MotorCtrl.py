@@ -124,7 +124,7 @@ class LinkamT96MotorCtrl(MotorController):
         if axis_name == 'axis_tst_stretcher':
             attr = 'tst_gap'
             value = self.device.read_attribute(attr).value
-            pos = value / self.attributes[axis_name]['step_per_unit']
+            value = value / self.attributes[axis_name]['step_per_unit']
 
         elif axis_name == 'axis_tst_temperature':
             attr = 'temperature'
