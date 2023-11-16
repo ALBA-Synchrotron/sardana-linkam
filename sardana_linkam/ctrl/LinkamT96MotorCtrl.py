@@ -127,7 +127,7 @@ class LinkamT96MotorCtrl(MotorController):
             value = value / self.attributes[axis_name]['step_per_unit']
 
         elif axis_name == 'axis_tst_temperature':
-            attr = 'temperature'
+            attr = 't96_temperature'
             value = self.device.read_attribute(attr).value
 
         return value
@@ -141,7 +141,8 @@ class LinkamT96MotorCtrl(MotorController):
             cmd = 'MoveGapAbsolute'
 
         elif axis_name == 'axis_tst_temperature':
-            cmd = 'StartTemperatureRamp'
+            cmd = 'StartRamp'
+            position = (10, position)
 
         self.device.command_inout(cmd, position)
 
