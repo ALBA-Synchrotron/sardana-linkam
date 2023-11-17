@@ -104,17 +104,29 @@ class LinkamT96MotorCtrl(MotorController):
         axis_name = self.axis2motor[axis]
         self._log.debug('Entering StateOne for axis {} ({})'.format(axis, axis_name))
 
+        self.status = ""
+
         if axis_name == 'axis_tst_stretcher':
             attribute = 'tst_stretching'
-        elif axis_name == 'axis_tst_temperature':
-            attribute = 'heater_ramping'
-        
-        if self.device.read_attribute(attribute).value:
-            self.state = State.Moving
-        else:
-            self.state = State.On
+            if self.device.read_attribute(attribute).value:
+                self.state = State.Moving
+            else:
+                self.state = State.On
 
-        return self.state
+        elif axis_name == 'axis_tst_temperature':
+            attribute = 'heater_state'
+            state_mappings = {
+                "Stopped" : State.Off,
+                "Holding" : State.On,
+                "Alarm" : State.On,
+                "Running" : State.Moving
+            }
+            state = self.device.read_attribute(attribute).value
+            self.state = state_mappings[state]
+            if state == "Alarm":
+                self.status = "Current temperature far from setpoint"
+
+        return self.state, self.status
 
     def ReadAll(self):
         pass
@@ -129,7 +141,7 @@ class LinkamT96MotorCtrl(MotorController):
             value = value / self.attributes[axis_name]['step_per_unit']
 
         elif axis_name == 'axis_tst_temperature':
-            attr = 't96_temperature'
+            attr = 'temperature_t96'
             value = self.device.read_attribute(attr).value
 
         return value
@@ -143,8 +155,7 @@ class LinkamT96MotorCtrl(MotorController):
             cmd = 'MoveGapAbsolute'
 
         elif axis_name == 'axis_tst_temperature':
-            cmd = 'StartRamp'
-            position = (10, position)
+            cmd = 'StartTemepratureRamp'
 
         self.device.command_inout(cmd, position)
 
@@ -168,7 +179,7 @@ class LinkamT96MotorCtrl(MotorController):
                 self.attributes[axis_name]['velocity'] = velocity
 
             elif axis_name == 'axis_tst_temperature':
-                attr = 'ramp_rate'
+                attr = 'temeperature_rate'
                 self.device.write_attribute(attr, value)
 
         elif name == "step_per_unit":
@@ -200,7 +211,7 @@ class LinkamT96MotorCtrl(MotorController):
                 value = self.attributes[axis_name]['velocity'] / self.attributes[axis_name]['step_per_unit']
                 
             elif axis_name == 'axis_tst_temperature':
-                value = self.device.ramp_rate
+                value = self.device.read_attribute("temperature_rate").value
 
         elif name == "step_per_unit":
             if axis_name == 'axis_tst_stretcher':
