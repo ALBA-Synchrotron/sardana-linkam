@@ -81,8 +81,10 @@ class LinkamT96MotorCtrl(MotorController):
         self._log.debug('AddDevice entering...')
         axis_name = self.axis2motor[axis]
         if axis_name == "axis_tst_stretcher":
-            self.attributes[axis_name] = {'step_per_unit': 1.0,
-                                     'velocity': 1}
+            # Read current setted velocity from the Device
+            velocity = self.device.read_attribute("tst_motor_velocity").w_value
+            self.attributes[axis_name] = {'step_per_unit': velocity,
+                                          'velocity': 1}
             
         elif axis_name == "axis_tst_temperature":
             # We do not need to store any attribute for this axis
