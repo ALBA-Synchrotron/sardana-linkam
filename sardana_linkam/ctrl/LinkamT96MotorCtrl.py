@@ -97,8 +97,7 @@ class LinkamT96MotorCtrl(MotorController):
             self.attributes[axis_name] = None
 
     def StateAll(self):
-        self._log.debug('Entering StateAll...')
-        self.device.UpdateStateFlags()
+        pass
 
     def StateOne(self, axis):
         axis_name = self.axis2motor[axis]
@@ -107,6 +106,7 @@ class LinkamT96MotorCtrl(MotorController):
         self.status = ""
 
         if axis_name == 'axis_tst_stretcher':
+            self.device.UpdateStateFlags()
             attribute = 'tst_stretching'
             if self.device.read_attribute(attribute).value:
                 self.state = State.Moving
@@ -116,7 +116,7 @@ class LinkamT96MotorCtrl(MotorController):
         elif axis_name == 'axis_tst_temperature':
             attribute = 'heater_state'
             state_mappings = {
-                "Stopped" : State.Off,
+                "Stopped" : State.On,
                 "Holding" : State.On,
                 "Alarm" : State.On,
                 "Running" : State.Moving
@@ -125,6 +125,7 @@ class LinkamT96MotorCtrl(MotorController):
             self.state = state_mappings[state]
             if state == "Alarm":
                 self.status = "Current temperature far from setpoint"
+                self._log.warning("Current temperature far from setpoint! It is taking too long to reach the setpoint.")
 
         return self.state, self.status
 
@@ -155,7 +156,7 @@ class LinkamT96MotorCtrl(MotorController):
             cmd = 'MoveGapAbsolute'
 
         elif axis_name == 'axis_tst_temperature':
-            cmd = 'StartTemepratureRamp'
+            cmd = 'StartTemperatureRamp'
 
         self.device.command_inout(cmd, position)
 
@@ -179,7 +180,7 @@ class LinkamT96MotorCtrl(MotorController):
                 self.attributes[axis_name]['velocity'] = velocity
 
             elif axis_name == 'axis_tst_temperature':
-                attr = 'temeperature_rate'
+                attr = 'temperature_rate'
                 self.device.write_attribute(attr, value)
 
         elif name == "step_per_unit":
@@ -232,7 +233,7 @@ class LinkamT96MotorCtrl(MotorController):
         if axis_name == 'axis_tst_stretcher':
             cmd = 'StopTSTMotor'
         elif axis_name == 'axis_tst_temperature':
-            cmd = 'HoldTemperature'
+            cmd = 'HoldTemp'
 
         self.device.command_inout(cmd)
 
