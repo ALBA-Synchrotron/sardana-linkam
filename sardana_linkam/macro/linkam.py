@@ -84,7 +84,7 @@ class linkam_start_ramp(linkam_base):
         self.debug("Linkam temperature ramp started.")
 
     
-class linkam_start_gap(linkam_base):
+class linkam_start_t96gap(linkam_base):
     """Start linkam gap movement."""
     param_def = [['target', Type.Float, None, 'Target position (mm)'],
                  ['rate', Type.Float, None, 'Ramp rate (mm/s)']]
@@ -106,7 +106,7 @@ class linkam_stop_ramp(linkam_base):
         self.debug("Linkam temperature ramp stopped. This cuts the power to the heater.")
 
 
-class linkam_stop_gap(linkam_base):
+class linkam_stop_t96gap(linkam_base):
     """Stop linkam gap movement."""
 
     def run(self):
