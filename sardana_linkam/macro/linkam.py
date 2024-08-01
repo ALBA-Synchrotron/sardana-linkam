@@ -9,7 +9,7 @@ UPDATE_LINE = u'\033[1A\033[K'
 
 
 class linkam_base(Macro):
-    def prepare(self):
+    def prepare(self, *args, **kwargs):
         dev_name = self.getEnv("LinkamDevice")
         self.linkam_dev = tango.DeviceProxy(dev_name)
         if hasattr(self.linkam_dev, "tst_gap"):
@@ -26,7 +26,7 @@ class linkam_base(Macro):
 class linkam_force_zero(linkam_base):
     """Macro that resets the force to zero in the Linkam Device Server."""
     def run(self):
-        assert self.linkam_dev == LINKAMT96, "Use model LinkamT96"
+        assert self.model == LINKAMT96, "Use model LinkamT96"
         self.linkam_dev.ForceZeroTST()
         self.output("LinkamT96 force reseted to zero")
 
@@ -84,18 +84,6 @@ class linkam_start_ramp(linkam_base):
         self.debug("Linkam temperature ramp started.")
 
     
-class linkam_start_t96gap(linkam_base):
-    """Start linkam gap movement."""
-    param_def = [['target', Type.Float, None, 'Target position (mm)'],
-                 ['rate', Type.Float, None, 'Ramp rate (mm/s)']]
-
-    def run(self, target, rate):
-        velocity = rate * 1000
-        position = target * 1000
-        assert self.linkam_dev == LINKAMT96, "Use model LinkamT96"
-        self.linkam_dev.tst_motor_velocity = velocity
-        self.linkam_dev.command_inout('MoveGapAbsolute', position)
-        self.debug("Linkam gap movement started.")
 
 
 class linkam_stop_ramp(linkam_base):
