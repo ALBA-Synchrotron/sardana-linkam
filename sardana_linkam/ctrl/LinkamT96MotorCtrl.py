@@ -188,11 +188,13 @@ class LinkamT96MotorCtrl(MotorController):
                 self.attributes[axis_name]["step_per_unit"] = float(value)
 
             elif axis_name == 'axis_tst_temperature':
-                raise Exception("{} is not supported for axis {} ({})".format(name, axis, axis_name))
+                # Parameter not configurable
+                pass
 
         elif name in ['acceleration', 'deceleration', 'base_rate']:
-            if axis in ['axis_tst_stretcher', 'axis_tst_temperature']:
-                raise Exception("{} does not support {}".format(self.__class__.__name__, name))
+            if axis_name in ['axis_tst_stretcher', 'axis_tst_temperature']:
+                # Parameters not configurable
+                pass
 
     def GetAxisPar(self, axis, name):
         """ Get the standard pool motor parameters.
@@ -219,11 +221,11 @@ class LinkamT96MotorCtrl(MotorController):
                 value = self.attributes[axis_name]["step_per_unit"]
 
             elif axis_name == 'axis_tst_temperature':
-                raise Exception("{} is not supported for axis {} ({})".format(name, axis, axis_name))
+                value = 1
 
         elif name in ['acceleration', 'deceleration', 'base_rate']:
-            if axis in ['axis_tst_stretcher', 'axis_tst_temperature']:
-                raise Exception("{} does not support {}".format(self.__class__.__name__, name))
+            if axis_name in ['axis_tst_stretcher', 'axis_tst_temperature']:
+                value = 0
 
         return value
 
