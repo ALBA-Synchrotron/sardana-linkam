@@ -7,7 +7,7 @@ with open("README.md") as f:
 
 setup(
     name="sardana_linkam",
-    version="1.2.0",
+    version="1.2.1",
     author="ALBA Controls Group",
     author_email="controls@cells.es",
     maintainer="Gabriel Jover-Manas",
