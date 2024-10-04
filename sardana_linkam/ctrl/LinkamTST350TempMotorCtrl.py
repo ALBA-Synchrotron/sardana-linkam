@@ -46,7 +46,7 @@ class LinkamTST350TempMotorCtrl(MotorController):
     sense.
 
     Position units: degrees.
-    Velocity units: degrees/minute
+    Velocity units: degrees/second
     """
 
     MaxDevice = 1
