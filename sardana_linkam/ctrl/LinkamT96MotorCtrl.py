@@ -180,8 +180,10 @@ class LinkamT96MotorCtrl(MotorController):
                 self.attributes[axis_name]['velocity'] = velocity
 
             elif axis_name == 'axis_tst_temperature':
+                # The devie units are deg/min, but we implement it in deg/second because 
+                # sardana assumes that the velocity units are in seconds
                 attr = 'temperature_rate'
-                self.device.write_attribute(attr, value)
+                self.device.write_attribute(attr, value * 60)
 
         elif name == "step_per_unit":
             if axis_name == 'axis_tst_stretcher':
@@ -214,7 +216,10 @@ class LinkamT96MotorCtrl(MotorController):
                 value = self.attributes[axis_name]['velocity'] / self.attributes[axis_name]['step_per_unit']
                 
             elif axis_name == 'axis_tst_temperature':
+                # The devie units are deg/min, but we implement it in deg/second because 
+                # sardana assumes that the velocity units are in seconds
                 value = self.device.read_attribute("temperature_rate").value
+                value = value / 60 
 
         elif name == "step_per_unit":
             if axis_name == 'axis_tst_stretcher':
