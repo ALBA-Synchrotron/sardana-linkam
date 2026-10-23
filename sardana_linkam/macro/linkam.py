@@ -66,11 +66,15 @@ class linkam_write_pumpspeed(linkam_base):
 
 
 class linkam_pumpmode(linkam_base):
-    """Set linkam pump mode. 0: automatic 1: manual 2: driven."""
+    """Set linkam pump mode. 0: automatic 1: manual 2: driven. Default is Manual."""
     param_def = [['mode', Type.Integer, 1, '0 Auto, 1 Manual, 2, Driven']]
 
     def run(self, mode):
+        if mode not in [0, 1, 2]:
+            raise ValueError('Invalid mode %s. Valid values are 0 (Auto), 1 (Manual) or 2 (Driven)' % mode)
         self.linkam_dev.write_attribute('PumpMode', mode)
+        mode_str = {0: 'Auto', 1: 'Manual', 2: 'Driven'}.get(mode, 'Unknown')
+        self.output('Linkam PumpMode set to %s' % mode_str)
 
 
 class linkam_start_ramp(linkam_base):
