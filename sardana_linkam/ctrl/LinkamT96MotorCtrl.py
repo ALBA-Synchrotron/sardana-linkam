@@ -152,7 +152,7 @@ class LinkamT96MotorCtrl(MotorController):
         self._log.debug('Entering StartOne for axis {} ({})'.format(axis, axis_name))
 
         if axis_name == 'axis_tst_stretcher':
-            position = position * self.attributes[axis_name]['step_per_unit']
+            position = int(position * self.attributes[axis_name]['step_per_unit'])
             cmd = 'MoveGapAbsolute'
 
         elif axis_name == 'axis_tst_temperature':
