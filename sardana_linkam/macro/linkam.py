@@ -114,11 +114,17 @@ class linkam_stop(linkam_base):
     """Stop linkam temperature ramp."""
 
     def run(self):
-        self.linkam_dev.command_inout('StopRamp')
-        self.linkam_dev.write_attribute('Pumpspeed', 0)
-        self.linkam_dev.write_attribute('PumpMode', 0)  # Auto
-        self.debug("Linkam temperature ramp stopped. This cuts the power to the heater.")
-        self.debug("Linkam LNP (Liquid Nitrogen Pump) mode to automatic and LNP speed to 0.")
+        try:
+            self.linkam_dev.command_inout('StopRamp')
+            self.debug("Linkam temperature ramp stopped. This cuts the power to the heater.")
+        except Exception as e:
+            self.error("Linkam temperature ramp stop failed: %s" % str(e))
+        try:
+            self.linkam_dev.write_attribute('Pumpspeed', 0)
+            self.linkam_dev.write_attribute('PumpMode', 0)  # Auto
+            self.debug("Linkam LNP (Liquid Nitrogen Pump) mode to automatic and LNP speed to 0.")
+        except Exception as e:
+            self.error("Linkam pump stop failed: %s" % str(e))
 
 
 class linkam_ramp(linkam_base):
